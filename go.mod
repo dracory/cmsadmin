@@ -8,7 +8,7 @@ require (
 	github.com/dracory/blockeditor v0.24.0
 	github.com/dracory/bs v0.16.0
 	github.com/dracory/cdn v1.13.0
-	github.com/dracory/cmsstore v1.46.0
+	github.com/dracory/cmsstore v1.46.1
 	github.com/dracory/entitystore v1.24.0
 	github.com/dracory/form v0.23.0
 	github.com/dracory/hb v1.88.0

@@ -38,6 +38,9 @@ requires system libs (libnspr4 etc.) that may be missing.
 - `/pages/page-update?view=media` — Add Media modal uploads a file via
   `chromedp.SetUploadFiles` (multipart `files[]`) and it appears in the
   media list
+- `/blocks/block-manager` — full block CRUD flows: htmx "New Block" modal
+  create, settings-view update (name edit), row-delete confirm modal
+  (soft delete), name/status filtering, pagination control navigation
 
 ## Gotchas learned
 
@@ -53,3 +56,18 @@ requires system libs (libnspr4 etc.) that may be missing.
   fixed row indices and don't delete seeded fixtures.
 - chromedp v0.23 rewrote the API (generic `Run[T]`); this suite pins the
   stable v0.14 line.
+- The store MUST use the shared-cache DSN `file::memory:?cache=shared`.
+  Plain `:memory:` gives each pooled `*sql.DB` connection a private DB —
+  under concurrent e2e load a second connection sees an empty schema and
+  writes/reads fail non-deterministically.
+- htmx-bound buttons inside modals swapped in via `hx-swap="beforeend"`
+  do not fire on programmatic `el.click()` — use real CDP clicks
+  (`chromedp.Click`), and poll the store (`clickUntil`) rather than a
+  fixed sleep, since requests occasionally lag under load.
+- The htmx success responses are `<script>` tags (swal + timed reload)
+  appended to the body — they do not execute in headless Chrome, so
+  don't wait for a reload; assert store state and re-navigate.
+- Block delete is `BlockSoftDelete` — the row disappears from default
+  `BlockQuery` listings but remains in the table only via
+  `SetSoftDeleteIncluded(true)`. Assert the status change server-side,
+  not the row's absence from the store.

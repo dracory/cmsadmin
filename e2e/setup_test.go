@@ -5,6 +5,7 @@ package e2e
 
 import (
 	"context"
+	"database/sql"
 	"log/slog"
 	"net/http"
 	"net/http/httptest"
@@ -34,7 +35,36 @@ const adminPath = "/admin/cms"
 
 func TestMain(m *testing.M) {
 	// In-process admin server backed by a seeded in-memory SQLite store.
-	store, err := testutils.InitStore(":memory:")
+	// Shared-cache DSN is required: plain ":memory:" gives each pooled
+	// connection its own private DB, so a second connection opened under
+	// concurrent e2e load would see an empty schema and fail randomly.
+	// Same options as cmsstore/testutils.InitStore.
+	db, err := sql.Open("sqlite", "file::memory:?cache=shared")
+	if err != nil {
+		panic("e2e: failed to open db: " + err.Error())
+	}
+	if err := db.Ping(); err != nil {
+		panic("e2e: failed to ping db: " + err.Error())
+	}
+
+	store, err := cmsstore.NewStore(cmsstore.NewStoreOptions{
+		DB:                         db,
+		BlockTableName:             "block_table",
+		PageTableName:              "page_table",
+		SiteTableName:              "site_table",
+		TemplateTableName:          "template_table",
+		MenusEnabled:               true,
+		MenuTableName:              "menu_table",
+		MenuItemTableName:          "menu_item_table",
+		TranslationsEnabled:        true,
+		TranslationTableName:       "translation_table",
+		TranslationLanguageDefault: "en",
+		VersioningEnabled:          true,
+		VersioningTableName:        "versioning_table",
+		MediaEnabled:               true,
+		MediaTableName:             "media_table",
+		AutomigrateEnabled:         true,
+	})
 	if err != nil {
 		panic("e2e: failed to init store: " + err.Error())
 	}
