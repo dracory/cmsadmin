@@ -26,6 +26,7 @@ var (
 	testStore  cmsstore.StoreInterface
 	seedSiteID string
 	seedPage   string
+	seedBlock  = "e2e-seed-block"
 )
 
 const adminPath = "/admin/cms"
@@ -87,6 +88,18 @@ func seedStore(store cmsstore.StoreInterface) {
 	}
 	if _, err := testutils.SeedTemplate(store, seedSiteID, "_01"); err != nil {
 		panic("e2e: failed to seed template: " + err.Error())
+	}
+	if _, err := testutils.SeedTranslation(store, seedSiteID, "_01"); err != nil {
+		panic("e2e: failed to seed translation: " + err.Error())
+	}
+
+	block := cmsstore.NewBlock()
+	block.SetName(seedBlock)
+	block.SetType(cmsstore.BLOCK_TYPE_HTML)
+	block.SetSiteID(seedSiteID)
+	block.SetStatus(cmsstore.BLOCK_STATUS_ACTIVE)
+	if err := store.BlockCreate(context.Background(), block); err != nil {
+		panic("e2e: failed to seed block: " + err.Error())
 	}
 }
 

@@ -33,6 +33,8 @@ requires system libs (libnspr4 etc.) that may be missing.
 - home — dashboard tiles render
 - `/pages/page-manager` — Vue-driven page list loads seeded pages
 - `/sites/site-manager` — server-rendered site table lists seeded site
+- `/blocks/block-manager` — block table lists seeded block
+- `/translations/translation-manager` — translation table lists seeded translation
 
 ## Gotchas learned
 
