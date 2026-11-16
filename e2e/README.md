@@ -35,6 +35,9 @@ requires system libs (libnspr4 etc.) that may be missing.
 - `/sites/site-manager` — server-rendered site table lists seeded site
 - `/blocks/block-manager` — block table lists seeded block
 - `/translations/translation-manager` — translation table lists seeded translation
+- `/pages/page-update?view=media` — Add Media modal uploads a file via
+  `chromedp.SetUploadFiles` (multipart `files[]`) and it appears in the
+  media list
 
 ## Gotchas learned
 

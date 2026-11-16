@@ -26,6 +26,7 @@ var (
 	testStore  cmsstore.StoreInterface
 	seedSiteID string
 	seedPage   string
+	seedPageID string
 	seedBlock  = "e2e-seed-block"
 )
 
@@ -80,9 +81,11 @@ func seedStore(store cmsstore.StoreInterface) {
 	seedSiteID = site.ID()
 
 	seedPage = "e2e-seed-page"
-	if _, err := testutils.SeedPage(store, seedSiteID, seedPage); err != nil {
+	page, err := testutils.SeedPage(store, seedSiteID, seedPage)
+	if err != nil {
 		panic("e2e: failed to seed page: " + err.Error())
 	}
+	seedPageID = page.ID()
 	if _, err := testutils.SeedPage(store, seedSiteID, "e2e-seed-page-2"); err != nil {
 		panic("e2e: failed to seed page 2: " + err.Error())
 	}
