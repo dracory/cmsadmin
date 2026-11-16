@@ -1,0 +1,75 @@
+package shared
+
+import (
+	"net/http"
+
+	"github.com/dracory/cmsstore"
+	"github.com/dracory/hb"
+	"github.com/dracory/req"
+	"github.com/samber/lo"
+)
+
+func AdminBreadcrumbs(r *http.Request, pageBreadcrumbs []Breadcrumb, options struct {
+	SiteList []cmsstore.SiteInterface
+}) hb.TagInterface {
+	adminHomeURL := AdminHomeURL(r)
+	siteID := req.GetStringTrimmed(r, "filter_site_id")
+	site, siteFound := lo.Find(options.SiteList, func(site cmsstore.SiteInterface) bool {
+		return site.ID() == siteID
+	})
+	path := req.GetStringTrimmed(r, "path")
+
+	adminHomeBreadcrumb := lo.
+		If(adminHomeURL != "", Breadcrumb{
+			Name: "Home",
+			URL:  adminHomeURL,
+		}).
+		Else(Breadcrumb{})
+
+	breadcrumbItems := []Breadcrumb{
+		adminHomeBreadcrumb,
+		{
+			Name: "CMS",
+			URL:  URLR(r, PathHome, nil),
+		},
+	}
+
+	breadcrumbItems = append(breadcrumbItems, pageBreadcrumbs...)
+
+	breadcrumbs := Breadcrumbs(breadcrumbItems)
+
+	dropdown := hb.Div().Class("dropdown float-end").
+		Child(hb.Button().
+			Class("btn btn-secondary dropdown-toggle").
+			Type("button").
+			Attr("data-bs-toggle", "dropdown").
+			Attr("aria-expanded", "false").
+			Text("Site: ").
+			Text(lo.IfF(siteFound, func() string { return site.Name() }).Else("all sites")))
+
+	dropdownMenu := hb.UL().
+		Class("dropdown-menu").
+		Child(hb.LI().
+			Class("dropdown-item").
+			Child(hb.Hyperlink().
+				Text("All sites").
+				Href(URLR(r, path, map[string]string{
+					"filter_site_id": "",
+				}))))
+
+	for _, site := range options.SiteList {
+		dropdownMenu.Child(hb.LI().
+			Class("dropdown-item").
+			Child(hb.Hyperlink().
+				Text(site.Name()).
+				Href(URLR(r, path, map[string]string{
+					"filter_site_id": site.ID(),
+				}))))
+	}
+
+	dropdown.Child(dropdownMenu)
+
+	return hb.Div().
+		Child(breadcrumbs).
+		Child(dropdown)
+}
