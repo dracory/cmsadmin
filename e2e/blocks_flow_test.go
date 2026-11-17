@@ -251,9 +251,9 @@ func TestBlockPagination(t *testing.T) {
 		t.Fatalf("pagination control did not render: %v", err)
 	}
 
-	// Follow the "2" page link — must load a valid manager page.
+	// Follow the page 2 link — must load a valid manager page.
 	err = chromedp.Run(ctx,
-		chromedp.Evaluate(clickButtonByTextJS(`ul.pagination a`, "2"), nil),
+		chromedp.Evaluate(clickLinkByPageParamJS(`ul.pagination a`, 2), nil),
 		chromedp.Sleep(1*time.Second),
 	)
 	if err != nil {

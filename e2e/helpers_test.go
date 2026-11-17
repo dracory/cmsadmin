@@ -3,6 +3,7 @@ package e2e
 import (
 	"context"
 	"net/url"
+	"strconv"
 	"testing"
 
 	"github.com/chromedp/chromedp"
@@ -66,6 +67,15 @@ func rowFindJS(name, inner string) string {
 func setInputJS(sel, value string) string {
 	return `(() => { const el = document.querySelector('` + sel + `');` +
 		` if (!el) return false; el.value = '` + value + `'; return true })()`
+}
+
+// clickLinkByPageParamJS returns JS that clicks the first element matching
+// sel whose href ends with ?page=N or &page=N. Used instead of matching
+// the link label, which may be 0- or 1-based depending on the bs version.
+func clickLinkByPageParamJS(sel string, page int) string {
+	return `(() => { const el = [...document.querySelectorAll('` + sel + `')]` +
+		`.find(a => /[?&]page=` + strconv.Itoa(page) + `$/.test(a.href));` +
+		` if (!el) return false; el.click(); return true })()`
 }
 
 // clickButtonByTextJS returns JS that clicks the first element matching

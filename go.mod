@@ -6,7 +6,7 @@ require (
 	github.com/chromedp/chromedp v0.14.2
 	github.com/dracory/api v1.8.0
 	github.com/dracory/blockeditor v0.24.0
-	github.com/dracory/bs v0.16.0
+	github.com/dracory/bs v0.17.0
 	github.com/dracory/cdn v1.13.0
 	github.com/dracory/cmsstore v1.46.1
 	github.com/dracory/entitystore v1.24.0
